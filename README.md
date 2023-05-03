@@ -4,17 +4,17 @@ There are a number of algorithms that can be used to assign students to projects
 
 
 	
-#####The Hungarian algorithm 
+##### The Hungarian algorithm 
 is a linear-time algorithm that can be used to find a stable matching between students and projects. A stable matching is one in which no student and project prefer each other to their current assignment.
 	
-###The auction algorithm 
+### The auction algorithm 
 is a heuristic algorithm that can be used to find a good solution to the student-project assignment problem. It is not guaranteed to find the optimal solution, but it is often very efficient.
 	
-###The greedy algorithm
+### The greedy algorithm
 is a simple algorithm that can be used to find a good solution to the student-project assignment problem. It is not guaranteed to find the optimal solution, but it is often very efficient.
 
 
-##THE CHALLENGE
+## THE CHALLENGE
 
 Write a script that will assign students to projects. The data is provided in the excel spreadsheet (attached). You want to optimise for all students receiving the highest priority project possible. I have the distribution of those receiving their first choice, second choice, etc. from the random assignment process, so that is your benchmark.
 
@@ -38,8 +38,8 @@ A self contained package that can read in data exported from the excel file and 
 	
 If you can think of any exciting, humorous or useful additions to the ranking that are also implemented as required...
 
-##THE PRIZE
+## THE PRIZE
 FREE DRINKS following the SCoTCH Research Day and potentially acknowledgment and recognition from generations of students if you're script is taken forward and implemented as Departmental policy.
  
-##DEADLINE: 
+## DEADLINE: 
 Submit entries (program and output) to TT 1 week before the SCoTCH research day so I can test and verify results. The winner will be announced on the day.... Happy coding 
