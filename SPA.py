@@ -70,7 +70,7 @@ atoms = atoms.astype(np.int64)
 print(atoms)
 
 
-positions = np.random.random((len(atoms), 3))*20
+positions = np.random.random((len(atoms), 3))*200
 
 bonds = pandas.DataFrame(columns=["i", "j", "rmin", "K"])
 
@@ -191,7 +191,7 @@ def CalcForces():
                     Forces[j][dim] -= Fi
 
 
-SGD = 0.9
+SGD = 0.1
 maxstep = 10
 #Plot()
 writeXYZ()
