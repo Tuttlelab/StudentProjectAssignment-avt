@@ -30,19 +30,23 @@ if not valid():
     print("Project selection isnt valid")
     sys.exit()
 
-#Calculate a score
-score = 0
-for student in Result.index:
-    #print(student)
-    project = Result.at[student, "Project"]
-    if project in choices.loc[student].values:
-        index = np.where(choices.loc["Student-1"].values == 70)[0][0] +1
-        score += 1/index
-    else:
-        score += 0
+
+def score():
+    #Calculate a score
+    score = 0
+    for student in Result.index:
+        #print(student)
+        project = Result.at[student, "Project"]
+        if project in choices.loc[student].values:
+            index = np.where(choices.loc["Student-1"].values == project)[0][0] +1
+            # index 0 = first choice, 9 = last choice (+1 so we dont devide by 0)
+            score += 1/index
+        else:
+            score += 0
+        return score
 
 
-print("Score:", score, "/", MaxScore)
+print("Score:", score(), "/", MaxScore)
 
 
 ### MD
@@ -70,7 +74,9 @@ atoms = atoms.astype(np.int64)
 print(atoms)
 
 
-positions = np.random.random((len(atoms), 3))*200
+#positions = np.random.random((len(atoms), 3))*10
+positions = np.vstack((np.vstack((np.arange(85)*15, [0]*85, [0]*85)).T,
+                       np.vstack((np.arange(88)*15, [15]*88, [0]*88)).T))
 
 bonds = pandas.DataFrame(columns=["i", "j", "rmin", "K"])
 
@@ -191,7 +197,7 @@ def CalcForces():
                     Forces[j][dim] -= Fi
 
 
-SGD = 0.1
+SGD = 0.5
 maxstep = 10
 #Plot()
 writeXYZ()
@@ -226,5 +232,15 @@ while maxstep > 0.00001:
         print("Accept", round(maxstep, 5))
         #Plot()
         writeXYZ()
+        
+    
+    #Choices by distance
+    d = euclidean_distances(positions[:85], positions[85:])
+    Result = pandas.DataFrame(columns=["Project"])
+    for i in range(d.shape[0]):
+        Result.at[f"Student-{i+1}", "Project"] = np.argmin(d[i])+1
+    print("Score:", score(), "/", MaxScore)
+        
+    #break
         
         
