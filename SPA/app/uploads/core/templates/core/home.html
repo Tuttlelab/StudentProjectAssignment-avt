@@ -1,22 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <ul>
-    <li>
-      <a href="{% url 'simple_upload' %}">Simple Upload</a>
-    </li>
-    <li>
-      <a href="{% url 'model_form_upload' %}">Model Form Upload</a>
-    </li>
-  </ul>
+<u>Upload projects list:</u>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="file" name="projectlists">
+  <button type="submit">Upload</button>  {{ ProjectListFound }}
+</form>
 
-  <p>Uploaded files:</p>
+<u>Upload student project choices:</u>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="file" name="studentchoices">
+  <button type="submit">Upload</button>  {{ StudentChoicesFound }}
+</form>
+
+
+
+  <!-- <p>Uploaded files:</p>
   <ul>
     {% for obj in documents %}
       <li>
         <a href="{{ obj.document.url }}">{{ obj.document.name }}</a>
-        <small>(Uploaded at: {{ obj.uploaded_at }})</small>
+        <small>File name: {{ obj }}</small>
       </li>
     {% endfor %}
-  </ul>
+  </ul> -->
+
+  {% autoescape off %}
+  <div style="overflow-y: scroll; height:400px;">
+    <large>Projects: {{ projects }}</large>
+  </div>
+  {% endautoescape %}
+
 {% endblock %}

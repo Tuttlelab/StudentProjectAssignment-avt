@@ -5,10 +5,44 @@ from django.core.files.storage import FileSystemStorage
 from uploads.core.models import Document
 from uploads.core.forms import DocumentForm
 
+import os, pandas
 
 def home(request):
-    documents = Document.objects.all()
-    return render(request, 'core/home.html', { 'documents': documents })
+    if request.method == 'POST':
+        if request.FILES['projectlists']:
+            myfile = request.FILES['projectlists']
+            fs = FileSystemStorage()
+            filename = fs.save("ProjectList.csv", myfile)
+            #uploaded_file_url = fs.url(filename)
+        elif request.FILES['studentchoices']:
+            myfile = request.FILES['studentchoices']
+            fs = FileSystemStorage()
+            filename = fs.save("StudentChoices.csv", myfile)
+            #uploaded_file_url = fs.url(filename)
+
+    #documents = Document.objects.all()
+    documents = os.listdir("media")
+    print("documents:", documents)
+
+    if os.path.exists("media/ProjectList.csv"):
+        ProjectListFound = "Project list found"
+    else:
+        ProjectListFound = "Project list NOT found"
+
+    if os.path.exists("media/StudentChoices.csv"):
+        StudentChoicesFound = "Student project choices found"
+    else:
+        StudentChoicesFound = "Student project choices NOT found"
+
+    try:
+        projects = pandas.read_csv("media/ProjectList.csv", index_col=0)
+        projects = projects.to_html()
+    except:
+        projects = "None"
+    return render(request, 'core/home.html', { 'documents': documents, 
+    'projects': projects,
+    'ProjectListFound': ProjectListFound,
+    'StudentChoicesFound': StudentChoicesFound})
 
 
 def simple_upload(request):

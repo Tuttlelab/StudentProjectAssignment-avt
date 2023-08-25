@@ -5,5 +5,8 @@ services:
       target: builder
     volumes:
       - ./app:/app
+    stdin_open: true
+    environment:
+      - PYTHONUNBUFFERED=1
     ports: 
       - '8000:8000'

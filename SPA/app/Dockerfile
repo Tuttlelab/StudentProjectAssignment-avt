@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM --platform=$BUILDPLATFORM python:3.7-alpine AS builder
+FROM --platform=$BUILDPLATFORM python:3.9-bullseye AS builder
 EXPOSE 8000
 WORKDIR /app 
 COPY requirements.txt /app
@@ -9,6 +9,7 @@ COPY . /app
 ENTRYPOINT ["python3"] 
 CMD ["manage.py", "migrate"]
 CMD ["manage.py", "runserver", "0.0.0.0:8000"]
+
 
 FROM builder as dev-envs
 RUN <<EOF
@@ -23,3 +24,7 @@ EOF
 # install Docker tools (cli, buildx, compose)
 COPY --from=gloursdocker/docker / /
 CMD ["manage.py", "runserver", "0.0.0.0:8000"]
+
+CMD ["manage.py", "makemigrations"]
+CMD ["manage.py", "migrate"]
+CMD ["manage.py", "migrate --run-syncdb"]
