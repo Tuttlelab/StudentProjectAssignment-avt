@@ -1,4 +1,4 @@
-## Student project assignment web application using teh Hungarian algorithm
+## Student project assignment web application using the Hungarian algorithm
 
 The initial site will look like this:
 ![alt text](images/Initial.png "Title")
