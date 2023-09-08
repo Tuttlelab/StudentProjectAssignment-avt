@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
+
+<head>
+  <script src="https://cdn.plot.ly/plotly-2.25.2.min.js" charset="utf-8"></script>
+</head>
+
 <center><h2>Data upload</h2></center>
 <u>Upload projects list:</u>
 <form method="post" enctype="multipart/form-data">
@@ -38,9 +44,19 @@
       <large>Student choices: {{ Choices }}</large>
     </div>
   </div>
-  {% endautoescape %}
+  
 
   <hr>
   <center><h2>Assign projects</h2></center>
 
+  {{ Report }}
+
+
+
+  <div id="myDiv" style="width:600px;height:250px;"></div>
+
+  {{ Plotly }}
+
+  {% endautoescape %}
+  
 {% endblock %}

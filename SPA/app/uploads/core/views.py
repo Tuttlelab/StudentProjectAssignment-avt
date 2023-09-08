@@ -5,6 +5,7 @@ from django.core.files.storage import FileSystemStorage
 from uploads.core.models import Document
 from uploads.core.forms import DocumentForm
 
+import mimetypes
 import os, pandas, sys, copy
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -27,6 +28,81 @@ def Hungarian(projects, choices):
     Result = pandas.DataFrame(index=choices.index, columns=["Project"])
     print(choices)
 
+    #Adjust the choices to account for projects with a capacity > 1
+    DecimalChoices = copy.copy(choices)
+    for student in choices.index:
+        new_choice_list = []
+        for choice in choices.loc[student].values:
+            new_choice_list.append(choice)
+            for decimal in np.arange(0.1, 1.0, 0.1):
+                if float(choice)+decimal in projects.index:
+                    new_choice_list.append(float(choice)+decimal)
+                else:
+                    break
+        print(new_choice_list)
+        for i in range(10):
+            DecimalChoices.at[student, i+1] = new_choice_list[i]
+    print(DecimalChoices)
+
+    CostMatrix = pandas.DataFrame(index=DecimalChoices.index, columns=projects.index)
+    #its a cost matrix so we want to price the choices low and the projects not chosen very highly
+    HighCost = 10000
+    CostMatrix[:] = HighCost
+
+    for student in DecimalChoices.index:
+        #Cost penality for invalid DecimalChoices
+        CostPenalty = np.where((DecimalChoices.loc[student] < ChoiceMin) | (DecimalChoices.loc[student] > ChoiceMax))[0].shape[0]
+        ValidChoices = np.where((DecimalChoices.loc[student] > ChoiceMin) & (DecimalChoices.loc[student] < ChoiceMax))[0]
+        for cost,choice in enumerate(DecimalChoices.loc[student].iloc[ValidChoices]):
+            CostMatrix.at[student, choice] = (cost**2) + CostPenalty
+            #CostMatrix.at[student, choice] = cost + CostPenalty
+    print(CostMatrix)
+
+    row_ind, col_ind = linear_sum_assignment(CostMatrix)
+
+    Result = pandas.DataFrame(index=choices.index, columns=["Project", "Choice #"])
+
+    for i in range(len(row_ind)):
+        student = CostMatrix.index[row_ind[i]]
+        project = CostMatrix.columns[col_ind[i]]
+        project = np.floor(project).astype(np.int64)
+        Result.at[student, "Project"] = project
+        try:
+            Result.at[student, "Choice #"] = np.where(choices.loc[student] == project)[0][0]+1
+        except:
+            Result.at[student, "Choice #"] = -1
+        
+    print(Result)
+    Result.to_csv("media/Project-assignment.csv")
+
+    int2word = {1: "First", 2: "Second", 3: "Third", 4: "Fourth", 5: "Fith",
+                6: "Sixth", 7: "Seventh", 8:"Eigth", 9: "Nineth", 10: "Tenth"}
+    Plotly = "<script>var data = [{"
+    Plotly_x = []
+    Plotly_y = []
+    Report = "Result summary:<br>"
+    for i in list(int2word.keys()):
+        Report = Report + f"Number of students that got their {int2word[i]} choice: " + str((Result["Choice #"] == i).sum()) + "<br>"
+        Plotly_x.append(int2word[i])
+        Plotly_y.append((Result["Choice #"] == i).sum())
+    Report = Report + "Average choice that each student got: " + str(Result[Result["Choice #"] != -1]["Choice #"].values.astype(np.float64).mean())
+    Plotly = Plotly + 'x: ' + str(Plotly_x) + ","
+    Plotly = Plotly + 'y: ' + str(Plotly_y) + ","
+    Plotly = Plotly + "type: 'bar'}];"
+    Plotly = Plotly + "Plotly.newPlot('myDiv', data); </script>"
+    print(Plotly)
+    return Report, Plotly
+
+# def download_file(request):
+#     # fill these variables with real values
+#     fl_path = 'media/Project-assignment.csv'
+#     filename = 'Project-assignment.csv'
+
+#     fl = open(fl_path, 'r’)
+#     mime_type, _ = mimetypes.guess_type(fl_path)
+#     response = HttpResponse(fl, content_type=mime_type)
+#     response['Content-Disposition'] = "attachment; filename=%s" % filename
+#         return response
 
 def home(request):
     os.system("python manage.py migrate")
@@ -70,13 +146,18 @@ def home(request):
 
     if not isinstance(projects, str) and not isinstance(Choices, str):
         # We have the data to perform the Hungarian optimization
-        Hungarian(projects, Choices)
+        report, plotly = Hungarian(projects, Choices)
+    else:
+        report = ""
+        plotly = ""
 
     return render(request, 'core/home.html', { 'documents': documents, 
         'projects': projects.to_html(),
         'Choices': Choices.to_html(),
         'ProjectListFound': ProjectListFound,
-        'StudentChoicesFound': StudentChoicesFound})
+        'StudentChoicesFound': StudentChoicesFound,
+        'Report': report,
+        'Plotly': plotly})
 
 
 
