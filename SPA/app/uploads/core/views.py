@@ -5,20 +5,44 @@ from django.core.files.storage import FileSystemStorage
 from uploads.core.models import Document
 from uploads.core.forms import DocumentForm
 
-import os, pandas
+import os, pandas, sys, copy
+import numpy as np
+from scipy.optimize import linear_sum_assignment
+
+def Hungarian(projects, choices):
+    ChoiceMin = min(projects.index)
+    ChoiceMax = max(projects.index)
+    # We allow for projects with capacity > 1 by making project 87 into projects 87 & 87.1
+    for i in projects.index:
+        if projects.at[i, "Capacity"] > 1:
+            for addition in range(1, projects.at[i, "Capacity"].astype(np.int64) +1):
+                projects.at[i+(addition/10), "Capacity"] = 1    
+                projects.at[i+(addition/10), "Section"] = projects.at[i, "Section"]    
+            projects.at[i, "Capacity"] = 1
+
+    projects = projects.sort_index()
+    print(projects.iloc[-5:])
+
+    choices.columns = [int(x) for x in choices.columns]
+    Result = pandas.DataFrame(index=choices.index, columns=["Project"])
+    print(choices)
+
 
 def home(request):
+    os.system("python manage.py migrate")
     if request.method == 'POST':
-        if request.FILES['projectlists']:
+        #print("request.FILES:", request.FILES)
+        #print("request.FILES:", request.FILES.keys())
+        if 'projectlists' in request.FILES.keys():
             myfile = request.FILES['projectlists']
             fs = FileSystemStorage()
             filename = fs.save("ProjectList.csv", myfile)
             #uploaded_file_url = fs.url(filename)
-        elif request.FILES['studentchoices']:
+        elif 'studentchoices' in request.FILES.keys():
             myfile = request.FILES['studentchoices']
             fs = FileSystemStorage()
             filename = fs.save("StudentChoices.csv", myfile)
-            #uploaded_file_url = fs.url(filename)
+
 
     #documents = Document.objects.all()
     documents = os.listdir("media")
@@ -36,13 +60,24 @@ def home(request):
 
     try:
         projects = pandas.read_csv("media/ProjectList.csv", index_col=0)
-        projects = projects.to_html()
     except:
         projects = "None"
+
+    try:
+        Choices = pandas.read_csv("media/StudentChoices.csv", index_col=0)
+    except:
+        Choices = "None"
+
+    if not isinstance(projects, str) and not isinstance(Choices, str):
+        # We have the data to perform the Hungarian optimization
+        Hungarian(projects, Choices)
+
     return render(request, 'core/home.html', { 'documents': documents, 
-    'projects': projects,
-    'ProjectListFound': ProjectListFound,
-    'StudentChoicesFound': StudentChoicesFound})
+        'projects': projects.to_html(),
+        'Choices': Choices.to_html(),
+        'ProjectListFound': ProjectListFound,
+        'StudentChoicesFound': StudentChoicesFound})
+
 
 
 def simple_upload(request):

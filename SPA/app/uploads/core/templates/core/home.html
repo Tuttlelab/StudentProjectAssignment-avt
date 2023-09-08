@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<center><h2>Data upload</h2></center>
 <u>Upload projects list:</u>
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
   <input type="file" name="projectlists">
   <button type="submit">Upload</button>  {{ ProjectListFound }}
 </form>
-
+<br>
 <u>Upload student project choices:</u>
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
   <input type="file" name="studentchoices">
   <button type="submit">Upload</button>  {{ StudentChoicesFound }}
 </form>
-
 
 
   <!-- <p>Uploaded files:</p>
@@ -26,11 +26,21 @@
       </li>
     {% endfor %}
   </ul> -->
-
+  <hr>
+  <center><h2>Check data</h2></center>
   {% autoescape off %}
-  <div style="overflow-y: scroll; height:400px;">
-    <large>Projects: {{ projects }}</large>
+  <div style="width: 100%;">
+    <div style="overflow-y: scroll; height:400px; width:50%; float: left;">
+      <large>Projects: {{ projects }}</large>
+    </div>
+
+    <div style="overflow-y: scroll; height:400px; width:50%; float: left;">
+      <large>Student choices: {{ Choices }}</large>
+    </div>
   </div>
   {% endautoescape %}
+
+  <hr>
+  <center><h2>Assign projects</h2></center>
 
 {% endblock %}
