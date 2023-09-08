@@ -85,7 +85,8 @@ def Hungarian(projects, choices):
         Report = Report + f"Number of students that got their {int2word[i]} choice: " + str((Result["Choice #"] == i).sum()) + "<br>"
         Plotly_x.append(int2word[i])
         Plotly_y.append((Result["Choice #"] == i).sum())
-    Report = Report + "Average choice that each student got: " + str(Result[Result["Choice #"] != -1]["Choice #"].values.astype(np.float64).mean())
+    Report = Report + "Average choice that each student got: " + str(Result[Result["Choice #"] != -1]["Choice #"].values.astype(np.float64).mean()) + "<br>"
+    Report = Report + "Download results: <a href='media/Project-assignment.csv'>Project-assignment.csv</a>"
     Plotly = Plotly + 'x: ' + str(Plotly_x) + ","
     Plotly = Plotly + 'y: ' + str(Plotly_y) + ","
     Plotly = Plotly + "type: 'bar'}];"
@@ -111,11 +112,15 @@ def home(request):
         #print("request.FILES:", request.FILES.keys())
         if 'projectlists' in request.FILES.keys():
             myfile = request.FILES['projectlists']
+            if os.path.exists("media/ProjectList.csv"):
+                os.remove("media/ProjectList.csv")
             fs = FileSystemStorage()
             filename = fs.save("ProjectList.csv", myfile)
             #uploaded_file_url = fs.url(filename)
         elif 'studentchoices' in request.FILES.keys():
             myfile = request.FILES['studentchoices']
+            if os.path.exists("media/StudentChoices.csv"):
+                os.remove("media/StudentChoices.csv")
             fs = FileSystemStorage()
             filename = fs.save("StudentChoices.csv", myfile)
 
@@ -137,19 +142,24 @@ def home(request):
     try:
         projects = pandas.read_csv("media/ProjectList.csv", index_col=0)
     except:
-        projects = "None"
+        projects = pandas.DataFrame()
 
     try:
         Choices = pandas.read_csv("media/StudentChoices.csv", index_col=0)
     except:
-        Choices = "None"
+        Choices = pandas.DataFrame()
 
-    if not isinstance(projects, str) and not isinstance(Choices, str):
+    if projects.shape[0] > 0 and Choices.shape[0] > 0:
         # We have the data to perform the Hungarian optimization
-        report, plotly = Hungarian(projects, Choices)
+        try:
+            report, plotly = Hungarian(projects, Choices)
+        except:
+            report = "Couldnt perform optimization on uploaded csv files"
+            plotly = ""
     else:
         report = ""
         plotly = ""
+
 
     return render(request, 'core/home.html', { 'documents': documents, 
         'projects': projects.to_html(),

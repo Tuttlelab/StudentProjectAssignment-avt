@@ -1,59 +1,20 @@
-## Compose sample application
+## Student project assignment web application using teh Hungarian algorithm
 
-### Use with Docker Development Environments
+The initial site will look like this:
+![alt text](Images/Initial.png "Title")
 
-You can open this sample in the Dev Environments feature of Docker Desktop version 4.12 or later.
+First step is to upload 2 CSV files.
 
-[Open in Docker Dev Environments <img src="../open_in_new.svg" alt="Open in Docker Dev Environments" align="top"/>](https://open.docker.com/dashboard/dev-envs?url=https://github.com/docker/awesome-compose/tree/master/django)
+The projects list:
+![alt text](Images/ProjectList.png "Title")
 
-### Django application in dev mode
 
-Project structure:
-```
-.
-├── compose.yaml
-├── app
-    ├── Dockerfile
-    ├── requirements.txt
-    └── manage.py
+And the student choices:
+![alt text](Images/StudentChoices.png "Title")
 
-```
+If the student has made 10 choices the blank options should be filled with '-1':
+![alt text](Images/BadChoice.png "Title")
 
-[_compose.yaml_](compose.yaml)
-```
-services: 
-  web: 
-    build: app 
-    ports: 
-      - '8000:8000'
-```
 
-## Deploy with docker compose
-
-```
-$ docker compose up -d
-Creating network "django_default" with the default driver
-Building web
-Step 1/6 : FROM python:3.7-alpine
-...
-...
-Status: Downloaded newer image for python:3.7-alpine
-Creating django_web_1 ... done
-
-```
-
-## Expected result
-
-Listing containers must show one container running and the port mapping as below:
-```
-$ docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                    NAMES
-3adaea94142d        django_web          "python3 manage.py r…"   About a minute ago   Up About a minute   0.0.0.0:8000->8000/tcp   django_web_1
-```
-
-After the application starts, navigate to `http://localhost:8000` in your web browser:
-
-Stop and remove the containers
-```
-$ docker compose down
-```
+One they have been uploaded the site will preview the csv files and optimise the choices:
+![alt text](Images/Result.png "Title")
