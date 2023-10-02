@@ -24,7 +24,7 @@ ChoiceMax = max(projects.index)
 # We allow for projects with capacity > 1 by making project 87 into projects 87 & 87.1
 for i in projects.index:
     if projects.at[i, "Capacity"] > 1:
-        for addition in range(1, projects.at[i, "Capacity"].astype(np.int64) +1):
+        for addition in range(1, projects.at[i, "Capacity"].astype(np.int64)):
             projects.at[i+(addition/10), "Capacity"] = 1    
             projects.at[i+(addition/10), "Section"] = projects.at[i, "Section"]    
         projects.at[i, "Capacity"] = 1
