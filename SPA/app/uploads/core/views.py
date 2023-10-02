@@ -106,6 +106,8 @@ def Hungarian(projects, choices):
 #         return response
 
 def home(request):
+    if not os.path.exists("media"):
+        os.mkdir("media")
     os.system("python manage.py migrate")
     if request.method == 'POST':
         #print("request.FILES:", request.FILES)
