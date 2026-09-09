@@ -14,6 +14,25 @@ If students have made invalid choices they have the cost penality incremented fo
 ### Limitations:
 - Assumes there is no project with capacity > 9
 
+### Standalone app
+*gui.py* is a Tkinter front end for the same `StudentProjectAssignment` logic — pick the two files, click "Run assignment", then "Save results as...". No typing paths, no console.
+
+#### Input file templates
+`templates/Projects-template.csv` and `templates/Student-choices-template.csv` show the exact columns each input file needs — copy one, replace the example rows with real data, and pass it to the app.
+
+- **Projects file**: a Project ID column, then `Section` (the supervisor/theme) and `Capacity` (how many students that project can take — no need to list a project twice, capacity > 1 is split into slots automatically).
+- **Student choices file**: a Student ID column, then one column per choice rank, most preferred first. Any number of choice columns works — a blank entry (or a project ID not in the projects file) counts as a missed choice and adds a small penalty to that student's *other* choices, per the Penalties section above.
+- Column header wording is flexible (e.g. "Supervisor" or "Staff" both work for `Section`) — the app matches on keywords, not exact text. `.xlsx` files work too, including messier exports with the table located anywhere on the sheet.
+
+#### Building the standalone app
+Requires an environment with `pyinstaller` and this project's dependencies (`pip install -r requirements.txt`) — on this machine that's the `PDRA` micromamba env, which already has PyInstaller but needs `openpyxl` added (`pip install openpyxl`).
+
+```
+pyinstaller Hungarian.spec
+```
+
+This produces a single `dist/StudentProjectAssignment.exe` that runs without Python installed.
+
 	
 
 #### Results
